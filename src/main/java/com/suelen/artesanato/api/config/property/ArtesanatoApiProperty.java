@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("artesanato")
 public class ArtesanatoApiProperty {
 	
-	private String originPermitida = "http://localhost:8000";
+	private String originPermitida = "http://localhost:8080";
 
 	private final Seguranca seguranca = new Seguranca();
 	

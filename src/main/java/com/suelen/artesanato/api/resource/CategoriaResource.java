@@ -12,17 +12,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.suelen.artesanato.api.event.RecursoCriadoEvent;
 import com.suelen.artesanato.api.model.Categoria;
 import com.suelen.artesanato.api.repository.CategoriaRepository;
+import com.suelen.artesanato.api.service.CategoriaService;
 
 @RestController
 @RequestMapping("/categorias")
@@ -33,6 +37,9 @@ public class CategoriaResource {
 	
 	@Autowired
 	private ApplicationEventPublisher  publisher;
+	
+	@Autowired 
+	private CategoriaService categoriaService;
 	
 	
 	@GetMapping
@@ -59,4 +66,19 @@ public class CategoriaResource {
 		return categoria.isPresent() ? 
 				ResponseEntity.ok(categoria.get()) : ResponseEntity.notFound().build();
 	}
+	
+	@DeleteMapping("/{codigo}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+	public void remover(@PathVariable Long codigo) {
+		categoriaRepository.deleteById(codigo);
+	}
+	
+	@PutMapping("/{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+	public ResponseEntity<Categoria> atualizar(@PathVariable Long codigo, @Valid @RequestBody Categoria categoria){
+		Categoria categoriaSalva = categoriaService.atualizar(codigo, categoria);
+		return ResponseEntity.ok(categoriaSalva);
+	}
+	
 }

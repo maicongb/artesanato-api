@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.br.CPF;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -30,12 +32,9 @@ public class Cliente {
 	private String nome;
 	
 	@NotNull
-	@Column(name = "tipo_pessoa")
-	private String tipoPessoa;
-	
-	@NotNull
-	@Column(name = "cpf_cnpj")
-	private String cpfCnpj;
+	@Column(name = "cpf_cnpj", unique=true)
+	@CPF 
+	private String cpf;
 
 	@Embedded
 	private Endereco endereco;
@@ -65,20 +64,12 @@ public class Cliente {
 		this.nome = nome;
 	}
 	
-	public String getTipoPessoa() {
-		return tipoPessoa;
+	public String getCpf() {
+		return cpf;
 	}
 
-	public void setTipoPessoa(String tipoPessoa) {
-		this.tipoPessoa = tipoPessoa;
-	}
-
-	public String getCpfCnpj() {
-		return cpfCnpj;
-	}
-
-	public void setCpfCnpj(String cpfCnpj) {
-		this.cpfCnpj = cpfCnpj;
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
 	}
 
 	public Endereco getEndereco() {

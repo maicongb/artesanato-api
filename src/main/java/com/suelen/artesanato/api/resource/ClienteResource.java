@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.suelen.artesanato.api.dto.ClientePesquisaDTO;
 import com.suelen.artesanato.api.event.RecursoCriadoEvent;
 import com.suelen.artesanato.api.exceptionhandler.ArtesanatoExceptionHandler.Erro;
 import com.suelen.artesanato.api.model.Cliente;
@@ -90,16 +91,10 @@ public class ClienteResource {
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
-	public Page<Cliente> pesquisar(ClienteFilter clienteFilter, Pageable pageable) {
+	public Page<ClientePesquisaDTO> pesquisar(ClienteFilter clienteFilter, Pageable pageable) {
 		
-		Page<Cliente> cliente = clienteRepository.filtrar(clienteFilter, pageable);
-		
-		for (Cliente cliente2 : cliente) {
-			System.err.println(cliente2.getNome());
-		}
-		
-			
-		return cliente;
+		return clienteRepository.filtrar(clienteFilter, pageable);
+	
 	}
 	
 	@ExceptionHandler({ PessoaExistenteException.class })

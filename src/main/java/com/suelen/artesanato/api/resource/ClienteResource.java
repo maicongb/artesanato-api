@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +31,7 @@ import com.suelen.artesanato.api.event.RecursoCriadoEvent;
 import com.suelen.artesanato.api.exceptionhandler.ArtesanatoExceptionHandler.Erro;
 import com.suelen.artesanato.api.model.Cliente;
 import com.suelen.artesanato.api.repository.ClienteRepository;
+import com.suelen.artesanato.api.repository.filter.ClienteFilter;
 import com.suelen.artesanato.api.service.ClienteService;
 import com.suelen.artesanato.api.service.exception.PessoaExistenteException;
 
@@ -90,8 +90,16 @@ public class ClienteResource {
 	
 	@GetMapping
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
-	public Page<Cliente> pesquisar(@RequestParam(required = false, defaultValue = "%") String nome, Pageable pageable) {
-		return clienteRepository.findByNomeContaining(nome, pageable);
+	public Page<Cliente> pesquisar(ClienteFilter clienteFilter, Pageable pageable) {
+		
+		Page<Cliente> cliente = clienteRepository.filtrar(clienteFilter, pageable);
+		
+		for (Cliente cliente2 : cliente) {
+			System.err.println(cliente2.getNome());
+		}
+		
+			
+		return cliente;
 	}
 	
 	@ExceptionHandler({ PessoaExistenteException.class })

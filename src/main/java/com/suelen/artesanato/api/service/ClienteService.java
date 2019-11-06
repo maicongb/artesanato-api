@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.suelen.artesanato.api.model.Cliente;
 import com.suelen.artesanato.api.repository.ClienteRepository;
-import com.suelen.artesanato.api.service.exception.PessoaExistenteException;
+import com.suelen.artesanato.api.service.exception.ClienteExistenteException;
 
 @Service
 public class ClienteService {
@@ -24,7 +24,7 @@ public class ClienteService {
 		Optional<Cliente> clienteExiste = clienteRepository.findByCpf(cliente.getCpf());
 		
 		if(clienteExiste.isPresent()) {
-			throw new PessoaExistenteException();
+			throw new ClienteExistenteException();
 		}
 		
 		

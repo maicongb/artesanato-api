@@ -34,7 +34,7 @@ import com.suelen.artesanato.api.model.Cliente;
 import com.suelen.artesanato.api.repository.ClienteRepository;
 import com.suelen.artesanato.api.repository.filter.ClienteFilter;
 import com.suelen.artesanato.api.service.ClienteService;
-import com.suelen.artesanato.api.service.exception.PessoaExistenteException;
+import com.suelen.artesanato.api.service.exception.ClienteExistenteException;
 
 @RestController 
 @RequestMapping("/clientes") 
@@ -97,9 +97,9 @@ public class ClienteResource {
 	
 	}
 	
-	@ExceptionHandler({ PessoaExistenteException.class })
-	public ResponseEntity<Object> handlePessoaExistenteException(PessoaExistenteException ex){
-		String mensagemUsuario = messageSource.getMessage("pessoa.existente", null, LocaleContextHolder.getLocale());
+	@ExceptionHandler({ ClienteExistenteException.class })
+	public ResponseEntity<Object> handleClienteExistenteException(ClienteExistenteException ex){
+		String mensagemUsuario = messageSource.getMessage("cliente.existente", null, LocaleContextHolder.getLocale());
 		String mensagemDesenvolvedor = ex.toString();
 		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		

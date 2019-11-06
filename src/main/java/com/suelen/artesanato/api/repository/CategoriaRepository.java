@@ -11,4 +11,6 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Long>{
 
 	Page<Categoria> findByNomeContaining(String nome, Pageable pageable);
 
+	Categoria findByCodigo(Long categoriaId);
+
 }

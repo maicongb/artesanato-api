@@ -1,5 +1,6 @@
 package com.suelen.artesanato.api.model;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 
 import javax.persistence.Entity;
@@ -10,6 +11,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "produto")
@@ -19,6 +23,7 @@ public class Produto {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long codigo;
 	
+	@Size(min = 3, max = 20)
 	@NotNull
 	private String descricao;
 	
@@ -71,6 +76,12 @@ public class Produto {
 
 	public void setAtivo(Boolean ativo) {
 		this.ativo = ativo;
+	}
+	
+	@JsonIgnore
+	@Transient
+	public boolean isInativo() {
+		return !this.ativo;
 	}
 
 	@Override

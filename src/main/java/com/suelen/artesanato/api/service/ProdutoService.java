@@ -2,7 +2,11 @@ package com.suelen.artesanato.api.service;
 
 import java.util.Optional;
 
+import javax.validation.Valid;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.suelen.artesanato.api.model.Categoria;
@@ -40,6 +44,42 @@ public class ProdutoService {
 		
 		
 		return produtoRepository.save(produto);
+	}
+
+	public Produto atualizar(Long codigo, @Valid Produto produto) {
+		
+		Produto produtoSalvo = buscarPorProdutoExistente(codigo);
+		
+		BeanUtils.copyProperties(produto, produtoSalvo, "codigo");
+		
+		return produtoRepository.save(produtoSalvo);
+	}
+
+	private Produto buscarPorProdutoExistente(Long codigo) {
+
+		Produto produtoSalvo = produtoRepository.findById(codigo)
+				.orElseThrow(() -> new IllegalArgumentException(
+						String.format("Não existe o produto que deseja alterar %d", codigo)));
+		
+		
+		return produtoSalvo;
+	}
+
+	public void atualizarPropriedadeAtivo(Long codigo, Boolean ativo) {
+		Produto produtoSalvo = buscarProdutoPeloCodigo(codigo);
+		produtoSalvo.setAtivo(ativo);
+		
+		produtoRepository.save(produtoSalvo);
+	}
+
+	private Produto buscarProdutoPeloCodigo(Long codigo) {
+		Optional<Produto> produtoSalvo = produtoRepository.findById(codigo);
+		
+		if(!produtoSalvo.isPresent()) {
+			throw new EmptyResultDataAccessException(1);
+		}
+		
+		return produtoSalvo.get();
 	}
 
 }

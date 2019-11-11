@@ -53,6 +53,7 @@ public class ProdutoResource {
 //	}
 	
 	@GetMapping("/{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
 	public ResponseEntity<Produto> buscaPeloCodigo(@PathVariable Long codigo) {
 		Optional<Produto> produto = produtoRepository.findById(codigo);
 		return produto.isPresent() ? ResponseEntity.ok(produto.get()) : ResponseEntity.notFound().build();

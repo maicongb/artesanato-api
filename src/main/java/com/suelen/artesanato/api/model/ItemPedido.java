@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="item_produto")
-public class ItemProduto {
+public class ItemPedido {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +36,7 @@ public class ItemProduto {
 	@ManyToOne
 	@JoinColumn(nullable = false)
 	private Produto produto;
-
+	
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -93,7 +93,7 @@ public class ItemProduto {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ItemProduto other = (ItemProduto) obj;
+		ItemPedido other = (ItemPedido) obj;
 		if (codigo == null) {
 			if (other.codigo != null)
 				return false;

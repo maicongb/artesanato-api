@@ -1,5 +1,6 @@
 package com.suelen.artesanato.api.resource;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -19,16 +20,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.suelen.artesanato.api.event.RecursoCriadoEvent;
+import com.suelen.artesanato.api.model.Foto;
 import com.suelen.artesanato.api.model.Produto;
 import com.suelen.artesanato.api.repository.ProdutoRepository;
 import com.suelen.artesanato.api.repository.filter.ProdutoFilter;
 import com.suelen.artesanato.api.service.ProdutoService;
 import com.suelen.artesanato.api.service.exception.EntidadeNaoEncontradaException;
 import com.suelen.artesanato.api.service.exception.ProdutoJaExistenteException;
+import com.suelen.artesanato.api.storage.local.FotoStorage;
 
 @RestController
 @RequestMapping("/produtos")
@@ -43,6 +49,10 @@ public class ProdutoResource {
 	@Autowired
 	private ApplicationEventPublisher publisher;
 	
+	@Autowired
+	private FotoStorage fotoStorage;
+	
+
 //	@GetMapping
 //	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
 //	public ResponseEntity<List<Produto>> listar() {
@@ -51,6 +61,27 @@ public class ProdutoResource {
 //		
 //		return ResponseEntity.ok().body(produto);
 //	}
+	
+	
+	//TRATADO PARA TER UM RETORNO ASSINCRONO
+	//MELHORA A DISPONIBILIDADE
+	@PostMapping("/foto")
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+	public List<Foto> uploadAnexo(@RequestParam MultipartFile[] foto) {
+		
+		List<Foto> fotoSalvas = fotoStorage.salvarTemporariamente(foto);
+		
+			
+		return fotoSalvas;
+	}
+	
+	
+	
+	@GetMapping("/temp/{descricao:.*}")
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+	public byte[] recuperarFotoTemporaria(@PathVariable String descricao) {
+		return fotoStorage.recuperarFotoTemporaria(descricao);
+	}
 	
 	@GetMapping("/{codigo}")
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
@@ -61,7 +92,7 @@ public class ProdutoResource {
 	
 	@PostMapping
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
-	public ResponseEntity<?> criar(@Valid @RequestBody Produto produto, HttpServletResponse response) {
+	public ResponseEntity<?> criar(@Valid @RequestPart("produto") Produto produto, HttpServletResponse response) {
 		
 		try {
 			
@@ -118,16 +149,5 @@ public class ProdutoResource {
 	public void atualizarPropriedadeAtivo(@PathVariable Long codigo, @RequestBody Boolean ativo) {
 		produtoService.atualizarPropriedadeAtivo(codigo, ativo);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }

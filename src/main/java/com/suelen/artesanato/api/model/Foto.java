@@ -1,9 +1,7 @@
 package com.suelen.artesanato.api.model;
 
-import java.beans.Transient;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigInteger;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,39 +9,35 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "produto")
-public class Produto {
+@Table(name = "foto")
+public class Foto {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long codigo;
 	
-	@Size(min = 3, max = 20)
 	@NotNull
 	private String descricao;
 	
 	@NotNull
-	private BigDecimal preco;
+	private String contentType;
 	
 	@NotNull
+	private BigInteger tamanho;
+	
 	@ManyToOne
-	@JoinColumn(name = "codigo_categoria")
-	private Categoria categoria;
+	@JoinColumn(name = "codigo_produto")
+	private Produto produto;
 	
-	@NotNull
-	private Boolean ativo;
-	
-	@OneToMany(mappedBy = "produto")
-	private List<Foto> fotos = new ArrayList<>();
-
+	public Foto(@NotNull String descricao, @NotNull String contentType, @NotNull BigInteger tamanho) {
+		this.descricao = descricao;
+		this.contentType = contentType;
+		this.tamanho = tamanho;
+	}
 
 	public Long getCodigo() {
 		return codigo;
@@ -61,42 +55,28 @@ public class Produto {
 		this.descricao = descricao;
 	}
 
-	public BigDecimal getPreco() {
-		return preco;
+	public String getContentType() {
+		return contentType;
 	}
 
-	public void setPreco(BigDecimal preco) {
-		this.preco = preco;
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 
-	public Categoria getCategoria() {
-		return categoria;
+	public BigInteger getTamanho() {
+		return tamanho;
 	}
 
-	public void setCategoria(Categoria categoria) {
-		this.categoria = categoria;
+	public void setTamanho(BigInteger tamanho) {
+		this.tamanho = tamanho;
 	}
 	
-	public Boolean getAtivo() {
-		return ativo;
+	public Produto getProduto() {
+		return produto;
 	}
 
-	public void setAtivo(Boolean ativo) {
-		this.ativo = ativo;
-	}
-	
-	public List<Foto> getFotos() {
-		return fotos;
-	}
-
-	public void setFotos(List<Foto> fotos) {
-		this.fotos = fotos;
-	}
-
-	@JsonIgnore
-	@Transient
-	public boolean isInativo() {
-		return !this.ativo;
+	public void setProduto(Produto produto) {
+		this.produto = produto;
 	}
 
 	@Override
@@ -115,15 +95,13 @@ public class Produto {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Produto other = (Produto) obj;
+		Foto other = (Foto) obj;
 		if (codigo == null) {
 			if (other.codigo != null)
 				return false;
 		} else if (!codigo.equals(other.codigo))
 			return false;
 		return true;
-	} 
+	}
 	
-	
-
 }

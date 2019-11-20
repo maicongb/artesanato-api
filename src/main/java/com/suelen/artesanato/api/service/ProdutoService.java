@@ -6,10 +6,12 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.suelen.artesanato.api.model.Categoria;
+import com.suelen.artesanato.api.model.Foto;
 import com.suelen.artesanato.api.model.Produto;
 import com.suelen.artesanato.api.repository.CategoriaRepository;
 import com.suelen.artesanato.api.repository.ProdutoRepository;
@@ -24,6 +26,9 @@ public class ProdutoService {
 	
 	@Autowired
 	private CategoriaRepository categoriaRepository;
+	
+	@Autowired
+	private ApplicationEventPublisher publisher;
 
 	public Produto salvar(Produto produto) {
 		
@@ -39,11 +44,17 @@ public class ProdutoService {
 		if(produtoExiste.isPresent()) {
 			throw new ProdutoJaExistenteException("Produto já cadastrado com esta descrição");
 		}
-		
+
 		produto.setCategoria(categoria);
 		
+		for(Foto foto : produto.getFoto()) {
+			foto.setProduto(produto);
+		}
 		
-		return produtoRepository.save(produto);
+				
+		//publisher.publishEvent(new ProdutoSalvoEvent(produto));
+		
+		return produtoRepository.saveAndFlush(produto);
 	}
 
 	public Produto atualizar(Long codigo, @Valid Produto produto) {

@@ -1,10 +1,12 @@
 package com.suelen.artesanato.api.model;
 
 import java.beans.Transient;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,12 +18,16 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "produto")
-public class Produto {
-	
+public class Produto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long codigo;
@@ -41,10 +47,12 @@ public class Produto {
 	@NotNull
 	private Boolean ativo;
 	
-	@OneToMany(mappedBy = "produto")
-	private List<Foto> fotos = new ArrayList<>();
-
-
+	@JsonIgnoreProperties("produto")
+	@OneToMany(mappedBy = "produto", cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+	private List<Foto> foto = new ArrayList<>();
+	
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -85,12 +93,12 @@ public class Produto {
 		this.ativo = ativo;
 	}
 	
-	public List<Foto> getFotos() {
-		return fotos;
+	public List<Foto> getFoto() {
+		return foto;
 	}
 
-	public void setFotos(List<Foto> fotos) {
-		this.fotos = fotos;
+	public void setFoto(List<Foto> foto) {
+		this.foto = foto;
 	}
 
 	@JsonIgnore

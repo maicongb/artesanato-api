@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.suelen.artesanato.api.dto.FotoDTO;
 import com.suelen.artesanato.api.model.Foto;
 
 
@@ -37,13 +38,14 @@ public class FotoStorageLocal implements FotoStorage {
 		String contentType; 
 		BigInteger tamanho;
 		
-		List<Foto> fotoSalvaTempararia = new ArrayList<Foto>();
+		List<Foto> fotoSalvaTempararia = new ArrayList<>();
 		
 		if(fotos != null) {
 			
 			for (int i = 0; i < fotos.length; i++) {
 				
 				MultipartFile arquivo = fotos[i];
+
 				novoNome = renomearArquivo(arquivo.getOriginalFilename());
 				contentType = fotos[i].getContentType();
 				tamanho = BigInteger.valueOf(fotos[i].getSize());
@@ -51,7 +53,7 @@ public class FotoStorageLocal implements FotoStorage {
 				try {
 					
 					arquivo.transferTo(new File(this.localTemporario.toAbsolutePath().toString() + FileSystems.getDefault().getSeparator() + novoNome));
-					fotoSalvaTempararia.add(new Foto(novoNome,contentType,tamanho));
+					fotoSalvaTempararia.add(new FotoDTO(null, novoNome, contentType, tamanho));
 				
 				} catch (IOException e) {
 					throw new RuntimeException("Erro salvando a foto na pasta temporária", e);

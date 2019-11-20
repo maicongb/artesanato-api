@@ -1,6 +1,5 @@
 package com.suelen.artesanato.api.model;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
@@ -33,12 +32,6 @@ public class Foto {
 	@JoinColumn(name = "codigo_produto")
 	private Produto produto;
 	
-	public Foto(@NotNull String descricao, @NotNull String contentType, @NotNull BigInteger tamanho) {
-		this.descricao = descricao;
-		this.contentType = contentType;
-		this.tamanho = tamanho;
-	}
-
 	public Long getCodigo() {
 		return codigo;
 	}

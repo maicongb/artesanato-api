@@ -51,10 +51,11 @@ public class ProdutoService {
 			foto.setProduto(produto);
 		}
 		
+		Produto produtoSalvo = produtoRepository.saveAndFlush(produto);
 				
-		//publisher.publishEvent(new ProdutoSalvoEvent(produto));
+		//publisher.publishEvent(new ProdutoSalvoEvent(produtoSalvo));
 		
-		return produtoRepository.saveAndFlush(produto);
+		return produtoSalvo;
 	}
 
 	public Produto atualizar(Long codigo, @Valid Produto produto) {

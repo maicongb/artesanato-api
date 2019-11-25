@@ -69,8 +69,6 @@ public class ProdutoResource {
 	public List<Foto> uploadAnexo(@RequestParam MultipartFile[] foto) {
 		
 		List<Foto> fotoSalvas = fotoStorage.salvarTemporariamente(foto);
-		
-			
 		return fotoSalvas;
 	}
 	
@@ -93,8 +91,8 @@ public class ProdutoResource {
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
 	public ResponseEntity<?> criar(@Valid @RequestBody Produto produto, HttpServletResponse response) {
 		
-		System.err.println("tsdfsafsfa");
-
+		System.err.println(">>>>>>>>>" + produto.getFoto().get(0).getUrlFoto());
+		
 		try {
 			
 			Produto produtoSalvo = produtoService.salvar(produto);

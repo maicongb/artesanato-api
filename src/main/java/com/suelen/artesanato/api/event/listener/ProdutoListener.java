@@ -17,7 +17,7 @@ public class ProdutoListener {
 	@EventListener(condition = "#produtoSalvoEvent.temFoto()")
 	public void produtoSalvo(ProdutoSalvoEvent produtoSalvoEvent) {
 		
-		//fotoStorage.salvar(produtoSalvoEvent);
+		fotoStorage.salvar(produtoSalvoEvent);
 	}
 
 }

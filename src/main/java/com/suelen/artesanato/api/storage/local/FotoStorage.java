@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.suelen.artesanato.api.event.ProdutoSalvoEvent;
 import com.suelen.artesanato.api.model.Foto;
 
 public interface FotoStorage {
@@ -11,4 +12,6 @@ public interface FotoStorage {
 	public List<Foto> salvarTemporariamente(MultipartFile[] fotos);
 
 	public byte[] recuperarFotoTemporaria(String descricao);
+
+	public void salvar(ProdutoSalvoEvent produtoSalvoEvent);
 }

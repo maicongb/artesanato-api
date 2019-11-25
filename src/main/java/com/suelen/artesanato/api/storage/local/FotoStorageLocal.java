@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.suelen.artesanato.api.dto.FotoDTO;
+import com.suelen.artesanato.api.event.ProdutoSalvoEvent;
 import com.suelen.artesanato.api.model.Foto;
 
 
@@ -37,8 +38,10 @@ public class FotoStorageLocal implements FotoStorage {
 		String novoNome = null;
 		String contentType; 
 		BigInteger tamanho;
+		String url;
 		
 		List<Foto> fotoSalvaTempararia = new ArrayList<>();
+		
 		
 		if(fotos != null) {
 			
@@ -47,13 +50,17 @@ public class FotoStorageLocal implements FotoStorage {
 				MultipartFile arquivo = fotos[i];
 
 				novoNome = renomearArquivo(arquivo.getOriginalFilename());
+				//novoNome = arquivo.getOriginalFilename();
 				contentType = fotos[i].getContentType();
 				tamanho = BigInteger.valueOf(fotos[i].getSize());
+				url = "http://localhost:4200/produtosFotos/temp/" + novoNome;;
+				
+				System.err.println(tamanho);
 				
 				try {
 					
 					arquivo.transferTo(new File(this.localTemporario.toAbsolutePath().toString() + FileSystems.getDefault().getSeparator() + novoNome));
-					fotoSalvaTempararia.add(new FotoDTO(null, novoNome, contentType, tamanho));
+					fotoSalvaTempararia.add(new FotoDTO(null, novoNome, contentType, tamanho, url));
 				
 				} catch (IOException e) {
 					throw new RuntimeException("Erro salvando a foto na pasta temporária", e);
@@ -76,6 +83,17 @@ public class FotoStorageLocal implements FotoStorage {
 		} catch (IOException e) {
 			throw new RuntimeException("Erro lendo a foto na pasta temporária", e);
 		}
+	}
+	
+	//SALVAR PERMANENTEMENT UMA FOTO
+	@Override
+	public void salvar(ProdutoSalvoEvent produtoSalvoEvent) {
+		
+		for(int i= 0; i < produtoSalvoEvent.getProduto().getFoto().size(); i++) {
+		
+			//Files.move(this.localTemporario.);
+		}	
+		
 	}
 
 	//CRIAR PASTAS LOCAL E TEMPORARIA
@@ -100,8 +118,5 @@ public class FotoStorageLocal implements FotoStorage {
 		String novoNome = UUID.randomUUID().toString() + "-" + nomeOriginal;
 		return novoNome;
 	}
-
-
-
 
 }

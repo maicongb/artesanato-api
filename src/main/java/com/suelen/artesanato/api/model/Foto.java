@@ -32,6 +32,9 @@ public class Foto {
 	@JoinColumn(name = "codigo_produto")
 	private Produto produto;
 	
+	@NotNull
+	private String urlFoto;
+	
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -70,6 +73,14 @@ public class Foto {
 
 	public void setProduto(Produto produto) {
 		this.produto = produto;
+	}
+	
+	public String getUrlFoto() {
+		return urlFoto;
+	}
+
+	public void setUrlFoto(String urlFoto) {
+		this.urlFoto = urlFoto;
 	}
 
 	@Override

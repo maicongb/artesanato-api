@@ -22,6 +22,7 @@
 		<spring-security-oauth2.version>2.2.1.RELEASE</spring-security-oauth2.version>
 		<spring-security-jwt.version>1.0.9.RELEASE</spring-security-jwt.version>
   
+  		 <aws-java-sdk.version>1.11.274</aws-java-sdk.version>
 
 	</properties>
 
@@ -102,6 +103,13 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		
+		<!-- Amazon S3 -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>${aws-java-sdk.version}</version>
+        </dependency>
    
 	</dependencies>
 

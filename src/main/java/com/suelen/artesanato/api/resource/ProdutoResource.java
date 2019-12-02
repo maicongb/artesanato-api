@@ -1,6 +1,6 @@
 package com.suelen.artesanato.api.resource;
 
-import java.util.List;
+import java.io.IOException;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -25,15 +25,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.suelen.artesanato.api.dto.Anexo;
 import com.suelen.artesanato.api.event.RecursoCriadoEvent;
-import com.suelen.artesanato.api.model.Foto;
 import com.suelen.artesanato.api.model.Produto;
 import com.suelen.artesanato.api.repository.ProdutoRepository;
 import com.suelen.artesanato.api.repository.filter.ProdutoFilter;
 import com.suelen.artesanato.api.service.ProdutoService;
 import com.suelen.artesanato.api.service.exception.EntidadeNaoEncontradaException;
 import com.suelen.artesanato.api.service.exception.ProdutoJaExistenteException;
-import com.suelen.artesanato.api.storage.local.FotoStorage;
+import com.suelen.artesanato.api.storage.local.S3;
 
 @RestController
 @RequestMapping("/produtos")
@@ -49,7 +49,7 @@ public class ProdutoResource {
 	private ApplicationEventPublisher publisher;
 	
 	@Autowired
-	private FotoStorage fotoStorage;
+	private S3 s3;
 	
 
 //	@GetMapping
@@ -66,19 +66,14 @@ public class ProdutoResource {
 	//MELHORA A DISPONIBILIDADE
 	@PostMapping("/foto")
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
-	public List<Foto> uploadAnexo(@RequestParam MultipartFile[] foto) {
+	public Anexo uploadAnexo(@RequestParam MultipartFile foto) throws IOException {
+		Anexo anexo = s3.salvarTemporariamente(foto);
 		
-		List<Foto> fotoSalvas = fotoStorage.salvarTemporariamente(foto);
-		return fotoSalvas;
+		System.err.println(anexo.getUrl());
+		
+		return anexo;
 	}
 	
-	
-	
-	@GetMapping("/temp/{descricao:.*}")
-	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
-	public byte[] recuperarFotoTemporaria(@PathVariable String descricao) {
-		return fotoStorage.recuperarFotoTemporaria(descricao);
-	}
 	
 	@GetMapping("/{codigo}")
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
@@ -90,8 +85,6 @@ public class ProdutoResource {
 	@PostMapping
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
 	public ResponseEntity<?> criar(@Valid @RequestBody Produto produto, HttpServletResponse response) {
-		
-		System.err.println(">>>>>>>>>" + produto.getFoto().get(0).getUrlFoto());
 		
 		try {
 			

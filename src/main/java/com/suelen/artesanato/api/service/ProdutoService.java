@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +16,7 @@ import com.suelen.artesanato.api.repository.CategoriaRepository;
 import com.suelen.artesanato.api.repository.ProdutoRepository;
 import com.suelen.artesanato.api.service.exception.EntidadeNaoEncontradaException;
 import com.suelen.artesanato.api.service.exception.ProdutoJaExistenteException;
+import com.suelen.artesanato.api.storage.local.S3;
 
 @Service
 public class ProdutoService {
@@ -28,7 +28,7 @@ public class ProdutoService {
 	private CategoriaRepository categoriaRepository;
 	
 	@Autowired
-	private ApplicationEventPublisher publisher;
+	private S3 s3;
 
 	public Produto salvar(Produto produto) {
 		
@@ -49,12 +49,15 @@ public class ProdutoService {
 		
 		for(Foto foto : produto.getFoto()) {
 			foto.setProduto(produto);
+			
+			//SAVAR PERMANENTEMENTE NO S3
+			s3.salvar(foto.getDescricao());
 		}
 		
-		Produto produtoSalvo = produtoRepository.saveAndFlush(produto);
-				
-		//publisher.publishEvent(new ProdutoSalvoEvent(produtoSalvo));
+
+
 		
+		Produto produtoSalvo = produtoRepository.saveAndFlush(produto);
 		return produtoSalvo;
 	}
 
@@ -62,7 +65,11 @@ public class ProdutoService {
 		
 		Produto produtoSalvo = buscarPorProdutoExistente(codigo);
 		
-		BeanUtils.copyProperties(produto, produtoSalvo, "codigo");
+		produtoSalvo.getFoto().clear();
+		produtoSalvo.getFoto().addAll(produto.getFoto());
+		produtoSalvo.getFoto().forEach(f -> f.setProduto(produtoSalvo));
+		
+		BeanUtils.copyProperties(produto, produtoSalvo, "codigo", "foto");
 		
 		return produtoRepository.save(produtoSalvo);
 	}

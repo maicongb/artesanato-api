@@ -142,4 +142,12 @@ public class ProdutoResource {
 		produtoService.atualizarPropriedadeAtivo(codigo, ativo);
 	}
 	
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@DeleteMapping("/deletar/foto/{descricao}")
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+	public void removerFoto(@PathVariable("descricao") String descricao) {
+		produtoService.removerFoto(descricao);
+		
+	}
+	
 }

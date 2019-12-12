@@ -1,5 +1,6 @@
 package com.suelen.artesanato.api.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -8,11 +9,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.suelen.artesanato.api.model.Categoria;
 import com.suelen.artesanato.api.model.Foto;
 import com.suelen.artesanato.api.model.Produto;
 import com.suelen.artesanato.api.repository.CategoriaRepository;
+import com.suelen.artesanato.api.repository.FotoRepository;
 import com.suelen.artesanato.api.repository.ProdutoRepository;
 import com.suelen.artesanato.api.service.exception.EntidadeNaoEncontradaException;
 import com.suelen.artesanato.api.service.exception.ProdutoJaExistenteException;
@@ -29,6 +32,9 @@ public class ProdutoService {
 	
 	@Autowired
 	private S3 s3;
+	
+	@Autowired
+	private FotoRepository fotoRepository;
 
 	public Produto salvar(Produto produto) {
 		
@@ -49,6 +55,7 @@ public class ProdutoService {
 		
 		for(Foto foto : produto.getFoto()) {
 			foto.setProduto(produto);
+			foto.setCodigo(null);
 			
 			//SAVAR PERMANENTEMENTE NO S3
 			s3.salvar(foto.getDescricao());
@@ -68,6 +75,25 @@ public class ProdutoService {
 		produtoSalvo.getFoto().clear();
 		produtoSalvo.getFoto().addAll(produto.getFoto());
 		produtoSalvo.getFoto().forEach(f -> f.setProduto(produtoSalvo));
+		
+//		if(!produto.getFoto().equals(produtoSalvo.getFoto())) {
+//			
+//			System.err.println("Entrouuuuuuu");
+//		
+//			for (Foto foto : produtoSalvo.getFoto()) {
+//				s3.remover(foto.getDescricao());
+//			}
+//			
+//			for(Foto foto : produto.getFoto()) {
+//				foto.setProduto(produto);
+//				
+//				//SAVAR PERMANENTEMENTE NO S3
+//				s3.salvar(foto.getDescricao());
+//			}
+//		
+//		}
+
+		
 		
 		BeanUtils.copyProperties(produto, produtoSalvo, "codigo", "foto");
 		
@@ -91,6 +117,17 @@ public class ProdutoService {
 		produtoRepository.save(produtoSalvo);
 	}
 
+	public void removerFoto(String descricao) {
+		
+		List<Foto> fotoExisteNoProduto = fotoRepository.findByDescricaoIgnoreCase(descricao);
+		
+		if(!CollectionUtils.isEmpty(fotoExisteNoProduto)) {
+			fotoRepository.deleteById(fotoExisteNoProduto.get(0).getCodigo());
+		}
+		
+		s3.remover(descricao);
+	}
+	
 	private Produto buscarProdutoPeloCodigo(Long codigo) {
 		Optional<Produto> produtoSalvo = produtoRepository.findById(codigo);
 		

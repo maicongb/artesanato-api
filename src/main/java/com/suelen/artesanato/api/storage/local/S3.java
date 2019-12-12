@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GroupGrantee;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.ObjectTagging;
@@ -91,6 +92,14 @@ public class S3 {
 		amazonS3.setObjectTagging(setObjectTaggingRequest);
 	}
 	
+	//REMOVER
+	public void remover(String objeto) {
+		DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(
+				property.getS3().getBucket(), objeto);
+		
+		amazonS3.deleteObject(deleteObjectRequest);
+	}
+	
 	//RETORNAR A URL
 	public String configurarUrl(String objeto) {
 		// AS BARRAS \\ SERVEM PARA PROTOCOLO HTTP OU HTTPS
@@ -101,6 +110,5 @@ public class S3 {
 	private String gerarNomeUnico(String originalFilename) {
 		return UUID.randomUUID().toString() + "_" + originalFilename;
 	}
-
 
 }

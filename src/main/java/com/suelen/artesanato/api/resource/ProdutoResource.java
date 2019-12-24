@@ -1,6 +1,7 @@
 package com.suelen.artesanato.api.resource;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -51,15 +52,15 @@ public class ProdutoResource {
 	@Autowired
 	private S3 s3;
 	
-
-//	@GetMapping
-//	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
-//	public ResponseEntity<List<Produto>> listar() {
-//		
-//		List<Produto> produto = produtoRepository.findAll();
-//		
-//		return ResponseEntity.ok().body(produto);
-//	}
+	//LISTAR PRODUTO/FOTO
+	@GetMapping("/listar/produtos")
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+	public ResponseEntity<List<Produto>> listar() {
+		
+		List<Produto> produto = produtoRepository.findAll();
+		
+		return ResponseEntity.ok().body(produto);
+	}
 	
 	
 	//TRATADO PARA TER UM RETORNO ASSINCRONO

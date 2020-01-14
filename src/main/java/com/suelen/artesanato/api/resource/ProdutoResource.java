@@ -69,9 +69,6 @@ public class ProdutoResource {
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
 	public Anexo uploadAnexo(@RequestParam MultipartFile foto) throws IOException {
 		Anexo anexo = s3.salvarTemporariamente(foto);
-		
-		System.err.println(anexo.getUrl());
-		
 		return anexo;
 	}
 	

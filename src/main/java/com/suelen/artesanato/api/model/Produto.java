@@ -53,6 +53,24 @@ public class Produto implements Serializable {
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 	private List<Foto> foto = new ArrayList<>();
 	
+	@NotNull
+	private BigDecimal altura;
+	
+	@NotNull
+	private BigDecimal largura;
+	
+	@NotNull
+	private BigDecimal comprimento;
+	
+	@NotNull
+	private BigDecimal peso;
+	
+	private String codigoProduto;
+	
+	@NotNull
+	private String observacao;
+	
+	
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -105,6 +123,54 @@ public class Produto implements Serializable {
 	@Transient
 	public boolean isInativo() {
 		return !this.ativo;
+	}
+	
+	public BigDecimal getAltura() {
+		return altura;
+	}
+
+	public void setAltura(BigDecimal altura) {
+		this.altura = altura;
+	}
+
+	public BigDecimal getLargura() {
+		return largura;
+	}
+
+	public void setLargura(BigDecimal largura) {
+		this.largura = largura;
+	}
+
+	public BigDecimal getComprimento() {
+		return comprimento;
+	}
+
+	public void setComprimento(BigDecimal comprimento) {
+		this.comprimento = comprimento;
+	}
+
+	public BigDecimal getPeso() {
+		return peso;
+	}
+
+	public void setPeso(BigDecimal peso) {
+		this.peso = peso;
+	}
+
+	public String getCodigoProduto() {
+		return codigoProduto;
+	}
+
+	public void setCodigoProduto(String codigoProduto) {
+		this.codigoProduto = codigoProduto;
+	}
+
+	public String getObservacao() {
+		return observacao;
+	}
+
+	public void setObservacao(String observacao) {
+		this.observacao = observacao;
 	}
 
 	@Override

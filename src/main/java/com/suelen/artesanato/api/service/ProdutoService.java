@@ -2,6 +2,7 @@ package com.suelen.artesanato.api.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -61,8 +62,11 @@ public class ProdutoService {
 			s3.salvar(foto.getDescricao());
 		}
 		
-
-
+		//GERAR CODIGO DO PRODUTO
+		String codigo = UUID.randomUUID().toString();
+		String codigoProduto = codigo.substring(0, 5);
+		
+		produto.setCodigoProduto(codigoProduto);
 		
 		Produto produtoSalvo = produtoRepository.saveAndFlush(produto);
 		return produtoSalvo;

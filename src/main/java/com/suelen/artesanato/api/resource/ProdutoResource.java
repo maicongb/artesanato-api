@@ -1,5 +1,6 @@
 package com.suelen.artesanato.api.resource;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +27,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.suelen.artesanato.api.config.property.ArtesanatoApiProperty;
 import com.suelen.artesanato.api.dto.Anexo;
 import com.suelen.artesanato.api.event.RecursoCriadoEvent;
 import com.suelen.artesanato.api.model.Produto;
 import com.suelen.artesanato.api.repository.ProdutoRepository;
 import com.suelen.artesanato.api.repository.filter.ProdutoFilter;
+import com.suelen.artesanato.api.service.ImagemService;
 import com.suelen.artesanato.api.service.ProdutoService;
 import com.suelen.artesanato.api.service.exception.EntidadeNaoEncontradaException;
 import com.suelen.artesanato.api.service.exception.ProdutoJaExistenteException;
@@ -52,6 +55,12 @@ public class ProdutoResource {
 	@Autowired
 	private S3 s3;
 	
+	@Autowired
+	private ImagemService imagemService;
+	
+	@Autowired
+	private ArtesanatoApiProperty property;
+	
 	//LISTAR PRODUTO/FOTO
 	@GetMapping("/listar/produtos")
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
@@ -68,7 +77,18 @@ public class ProdutoResource {
 	@PostMapping("/foto")
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
 	public Anexo uploadAnexo(@RequestParam MultipartFile foto) throws IOException {
-		Anexo anexo = s3.salvarTemporariamente(foto);
+		
+		String nome = foto.getOriginalFilename();
+		String contentType = foto.getContentType();
+		Long tamanho = foto.getSize();
+				
+		BufferedImage jpgImage = imagemService.getJpgImageFromFile(foto);
+				
+		jpgImage = imagemService.cropSquare(jpgImage);
+		jpgImage = imagemService.resize(jpgImage, property.getS3().getImg());
+		
+		
+		Anexo anexo = s3.salvarTemporariamente(imagemService.getInputStream(jpgImage, "jpg"), nome, contentType, tamanho);
 		return anexo;
 	}
 	

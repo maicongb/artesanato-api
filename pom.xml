@@ -110,6 +110,20 @@
             <artifactId>aws-java-sdk</artifactId>
             <version>${aws-java-sdk.version}</version>
         </dependency>
+        
+		<!-- RENDERIZAR IMAGEM -->
+        <dependency>
+            <groupId>org.imgscalr</groupId>
+            <artifactId>imgscalr-lib</artifactId>
+            <version>4.2</version>
+        </dependency>
+        
+		<!-- PEGAR A EXTENÇÃO DO ARQUIVO JPG -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>LATEST</version>
+        </dependency>
    
 	</dependencies>
 

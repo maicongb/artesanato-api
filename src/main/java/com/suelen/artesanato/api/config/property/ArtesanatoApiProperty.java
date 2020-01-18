@@ -18,6 +18,7 @@ public class ArtesanatoApiProperty {
 	public S3 getS3() {
 		return s3;
 	}
+	
 
 	//===================================================================	
 	//S3 STORAGE
@@ -27,6 +28,9 @@ public class ArtesanatoApiProperty {
 		private String secretAccessKey;
 		private String bucket = "mgb-artesanato-arquivos";
 		
+		//RENDERIZAR IMAGEM
+		private Integer img;
+		
 		public String getBucket() {
 			return bucket;
 		}
@@ -35,25 +39,33 @@ public class ArtesanatoApiProperty {
 			this.bucket = bucket;
 		}
 		
-		
 		public String getAccessKeyId() {
 			return accessKeyId;
 		}
+		
 		public void setAccessKeyId(String accessKeyId) {
 			this.accessKeyId = accessKeyId;
 		}
+		
 		public String getSecretAccessKey() {
 			return secretAccessKey;
 		}
+		
 		public void setSecretAccessKey(String secretAccessKey) {
 			this.secretAccessKey = secretAccessKey;
+		}
+
+		public Integer getImg() {
+			return img;
+		}
+
+		public void setImg(Integer img) {
+			this.img = img;
 		}
 		
 	}
 //===================================================================	
-	
-	
-	
+
 
 	public String getOriginPermitida() {
 		return originPermitida;
@@ -75,6 +87,6 @@ public class ArtesanatoApiProperty {
 			this.enableHttps = enableHttps;
 		}
 	}
-
+//===================================================================
 
 }

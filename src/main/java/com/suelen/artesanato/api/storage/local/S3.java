@@ -1,6 +1,6 @@
 package com.suelen.artesanato.api.storage.local;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AccessControlList;
@@ -35,49 +34,37 @@ public class S3 {
 	
 	private static final Logger logger = LoggerFactory.getLogger(S3.class);
 	
-	public Anexo salvarTemporariamente(MultipartFile arquivo) {
-		
-		
-		System.err.println(arquivo.getSize());
+	public Anexo salvarTemporariamente(InputStream arquvio, String nome, String contentType, Long tamanho) {
 		
 		AccessControlList acl = new AccessControlList();
 		acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
 		
 		ObjectMetadata objectMetadata = new ObjectMetadata();
-		objectMetadata.setContentType(arquivo.getContentType());
-		objectMetadata.setContentLength(arquivo.getSize());
+		objectMetadata.setContentType(contentType);
+		//objectMetadata.setContentLength(tamanho);
 		
-		String nomeUnico = gerarNomeUnico(arquivo.getOriginalFilename());
-		String contentType = arquivo.getContentType();
-		Long tamanho = arquivo.getSize();
+		String nomeUnico = gerarNomeUnico(nome);
 		String url = configurarUrl(nomeUnico);
 		
-		//ENVIAR ARQUIVO PARA O S3
-		try {
-			PutObjectRequest putObjectRequest = new PutObjectRequest(
-					property.getS3().getBucket(),
-					nomeUnico,
-					arquivo.getInputStream(),
-					objectMetadata)
-					.withAccessControlList(acl);
+		PutObjectRequest putObjectRequest = new PutObjectRequest(
+				property.getS3().getBucket(),
+				nomeUnico,
+				arquvio,
+				objectMetadata)
+				.withAccessControlList(acl);
+		
+		//TEMPO DE EXPIRAR O ARQUIVO 1 DIA
+		putObjectRequest.setTagging(new ObjectTagging(
+				Arrays.asList(new Tag("expirar", "true"))));
+		
+			amazonS3.putObject(putObjectRequest);
 			
-			//TEMPO DE EXPIRAR O ARQUIVO 1 DIA
-			putObjectRequest.setTagging(new ObjectTagging(
-					Arrays.asList(new Tag("expirar", "true"))));
+			if (logger.isDebugEnabled()) {
+				logger.debug("Arquivo {} enviado com sucesso para o S3.", 
+						nome);
+			}
 			
-				amazonS3.putObject(putObjectRequest);
-				
-				if (logger.isDebugEnabled()) {
-					logger.debug("Arquivo {} enviado com sucesso para o S3.", 
-							arquivo.getOriginalFilename());
-				}
-				
-				return new Anexo(nomeUnico, contentType, tamanho, url);
-				
-				
-		} catch (IOException e) {
-			throw new RuntimeException("Problema para enviar o arquivo para o S3", e);
-		}
+			return new Anexo(nomeUnico, contentType, tamanho, url);
 	}
 
 	
@@ -110,5 +97,7 @@ public class S3 {
 	private String gerarNomeUnico(String originalFilename) {
 		return UUID.randomUUID().toString() + "_" + originalFilename;
 	}
+
+
 
 }

@@ -43,7 +43,16 @@ public class S3 {
 		objectMetadata.setContentType(contentType);
 		//objectMetadata.setContentLength(tamanho);
 		
-		String nomeUnico = gerarNomeUnico(nome);
+		String nomeUnico;
+		
+		if(nome.length() > 36) {
+			nomeUnico = nome.substring(0,36) + "_" + "original" + "_" + nome.substring(37);
+			System.err.println(nomeUnico);
+		} else {
+			nomeUnico = gerarNomeUnico(nome);
+			System.err.println(nomeUnico);
+		}
+		
 		String url = configurarUrl(nomeUnico);
 		
 		PutObjectRequest putObjectRequest = new PutObjectRequest(

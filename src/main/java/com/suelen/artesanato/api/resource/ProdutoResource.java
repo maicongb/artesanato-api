@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.suelen.artesanato.api.config.property.ArtesanatoApiProperty;
 import com.suelen.artesanato.api.dto.Anexo;
 import com.suelen.artesanato.api.event.RecursoCriadoEvent;
+import com.suelen.artesanato.api.model.Foto;
 import com.suelen.artesanato.api.model.Produto;
 import com.suelen.artesanato.api.repository.ProdutoRepository;
 import com.suelen.artesanato.api.repository.filter.ProdutoFilter;
@@ -84,6 +85,21 @@ public class ProdutoResource {
 				
 		BufferedImage jpgImage = imagemService.getJpgImageFromFile(foto);
 				
+		Anexo anexo = savarImagemReduzir(nome, contentType, tamanho, jpgImage);
+		salvarImagemOriginal(anexo.getNome(), contentType, tamanho, jpgImage);
+		
+		
+		return anexo;
+	}
+
+
+	private void salvarImagemOriginal(String nome, String contentType, Long tamanho, BufferedImage jpgImage) {
+		s3.salvarTemporariamente(imagemService.getInputStream(jpgImage, "jpg"), nome, contentType, tamanho);
+		
+	}
+
+
+	private Anexo savarImagemReduzir(String nome, String contentType, Long tamanho, BufferedImage jpgImage) {
 		jpgImage = imagemService.cropSquare(jpgImage);
 		jpgImage = imagemService.resize(jpgImage, property.getS3().getImg());
 		
@@ -93,10 +109,29 @@ public class ProdutoResource {
 	}
 	
 	
+	
+	
 	@GetMapping("/{codigo}")
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
 	public ResponseEntity<Produto> buscaPeloCodigo(@PathVariable Long codigo) {
 		Optional<Produto> produto = produtoRepository.findById(codigo);
+		return produto.isPresent() ? ResponseEntity.ok(produto.get()) : ResponseEntity.notFound().build();
+	}
+	
+	@GetMapping("/detalhar/{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+	public ResponseEntity<Produto> detalharBuscaPeloCodigo(@PathVariable Long codigo) {
+		
+		
+		System.err.println("Entrou");
+		
+		Optional<Produto> produto = produtoRepository.findById(codigo);
+		for(Foto foto : produto.get().getFoto()) {
+			String nomeUnico = foto.getDescricao().substring(0,36) + "_" + "original" + "_" + foto.getDescricao().substring(37);
+			foto.setDescricao(nomeUnico);
+			
+		}
+		
 		return produto.isPresent() ? ResponseEntity.ok(produto.get()) : ResponseEntity.notFound().build();
 	}
 	

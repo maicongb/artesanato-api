@@ -53,14 +53,20 @@ public class ProdutoService {
 		}
 
 		produto.setCategoria(categoria);
-		
+	
 		for(Foto foto : produto.getFoto()) {
 			foto.setProduto(produto);
 			foto.setCodigo(null);
 			
 			//SAVAR PERMANENTEMENTE NO S3
 			s3.salvar(foto.getDescricao());
+			String nomeUnico = foto.getDescricao().substring(0,36) + "_" + "original" + "_" + foto.getDescricao().substring(37);
+			
+			foto.setDescricao(nomeUnico);
+			//SAVAR PERMANENTEMENTE NO S3
+			s3.salvar(foto.getDescricao());
 		}
+
 		
 		//GERAR CODIGO DO PRODUTO
 		String codigo = UUID.randomUUID().toString();

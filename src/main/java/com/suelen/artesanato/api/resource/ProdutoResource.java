@@ -32,6 +32,7 @@ import com.suelen.artesanato.api.dto.Anexo;
 import com.suelen.artesanato.api.event.RecursoCriadoEvent;
 import com.suelen.artesanato.api.model.Foto;
 import com.suelen.artesanato.api.model.Produto;
+import com.suelen.artesanato.api.repository.FotoRepository;
 import com.suelen.artesanato.api.repository.ProdutoRepository;
 import com.suelen.artesanato.api.repository.filter.ProdutoFilter;
 import com.suelen.artesanato.api.service.ImagemService;
@@ -61,6 +62,9 @@ public class ProdutoResource {
 	
 	@Autowired
 	private ArtesanatoApiProperty property;
+	
+	@Autowired
+	private FotoRepository fotoRepository;
 	
 	//LISTAR PRODUTO/FOTO
 	@GetMapping("/listar/produtos")
@@ -122,14 +126,30 @@ public class ProdutoResource {
 	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
 	public ResponseEntity<Produto> detalharBuscaPeloCodigo(@PathVariable Long codigo) {
 		
-		
-		System.err.println("Entrou");
-		
 		Optional<Produto> produto = produtoRepository.findById(codigo);
+		return produto.isPresent() ? ResponseEntity.ok(produto.get()) : ResponseEntity.notFound().build();
+		
+	}
+	
+	@GetMapping("/detalhar/fotos/{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')")
+	public ResponseEntity<Produto> buscaProtudotPorCodigoFoto(@PathVariable Long codigo) {
+		
+		Optional<Foto> fotoSalva = fotoRepository.findById(codigo);
+		Optional<Produto> produto = produtoRepository.findByFotoCodigo(fotoSalva.get().getCodigo());
+		
 		for(Foto foto : produto.get().getFoto()) {
-			String nomeUnico = foto.getDescricao().substring(0,36) + "_" + "original" + "_" + foto.getDescricao().substring(37);
-			foto.setDescricao(nomeUnico);
 			
+			String nome = foto.getDescricao();
+			String nomeUnico;
+			
+			if(!nome.contains("original")) {
+				nomeUnico = foto.getUrlFoto().substring(0,83) + "_" + "original" + "_" + foto.getDescricao().substring(37);
+				foto.setUrlFoto(nomeUnico);
+			} else {
+				nomeUnico = foto.getUrlFoto().substring(0,47) + foto.getDescricao();
+				foto.setUrlFoto(nomeUnico);
+			}
 		}
 		
 		return produto.isPresent() ? ResponseEntity.ok(produto.get()) : ResponseEntity.notFound().build();
